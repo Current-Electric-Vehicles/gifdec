@@ -73,7 +73,7 @@ gd_GIF *gd_open_gif_memory(const char *data, size_t size);
 int gd_get_frame(gd_GIF *gif);
 void gd_render_frame(gd_GIF *gif, uint8_t *buffer);
 int gd_is_bgcolor(gd_GIF *gif, uint8_t color[3]);
-void gd_rewind(gd_GIF *gif);
+off_t gd_rewind(gd_GIF *gif);
 void gd_close_gif(gd_GIF *gif);
 
 #ifdef __cplusplus

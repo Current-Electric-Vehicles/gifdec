@@ -321,7 +321,7 @@ new_table(int key_size)
         for (key = 0; key < (1 << key_size); key++)
             table->entries[key] = (Entry) {1, 0xFFF, (uint8_t)key};
     } else {
-      GD_LOG_ERROR("Unable to allocate memory for LZW code table");
+      GD_LOG_ERROR("Unable to allocate memory for LZW code table: %d %p", (sizeof(*table) + sizeof(Entry) * init_bulk), table);
     }
     return table;
 }
@@ -426,6 +426,9 @@ read_image_data(gd_GIF *gif, int interlace)
     clear = 1 << key_size;
     stop = clear + 1;
     table = new_table(key_size);
+    if (!table) {
+      return -1;
+    }
     key_size++;
     init_key_size = key_size;
     sub_len = shift = 0;
@@ -582,16 +585,14 @@ gd_render_frame(gd_GIF *gif, uint8_t *buffer)
     render_frame_rect(gif, buffer);
 }
 
-int
-gd_is_bgcolor(gd_GIF *gif, uint8_t color[3])
-{
-    return !memcmp(&gif->palette->colors[gif->bgindex*3], color, 3);
+int gd_is_bgcolor(gd_GIF *gif, uint8_t color[3]) {
+  return !memcmp(&gif->palette->colors[gif->bgindex * 3], color, 3);
 }
 
-void
+off_t
 gd_rewind(gd_GIF *gif)
 {
-    gif->gd_lseek(gif, gif->anim_start, SEEK_SET);
+    return gif->gd_lseek(gif, gif->anim_start, SEEK_SET);
 }
 
 void
